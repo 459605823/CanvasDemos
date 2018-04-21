@@ -116,7 +116,6 @@ function render(cxt){
   renderDigit(margin_left+78*(radius+1),margin_top,parseInt(seconds/10),cxt);
   renderDigit(margin_left+93*(radius+1),margin_top,parseInt(seconds%10),cxt);
   for(var i=0;i<balls.length;i++){//绘制掉落的彩色小球
-    cxt.globalCompositeOperation = "xor";
     cxt.fillStyle = balls[i].color;
     cxt.beginPath();
     cxt.arc(balls[i].x,balls[i].y,radius,0,2*Math.PI);
