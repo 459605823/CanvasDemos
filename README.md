@@ -6,7 +6,7 @@ study canvas in imooc.com
 主要学习课程：
 
 
-1.炫丽的倒计时效果Canvas绘图与动画基础：学会canvas的绘图基础，和在canvas中添加动画，并结合物理产生实际的运动效果 
+1.炫丽的倒计时效果Canvas绘图与动画基础：学会canvas的绘图基础，和在canvas中添加动画，并结合物理产生实际的运动效果以及碰撞检测的原理
 
 
 2.Canvas绘图详解：该课程深入讲解了canvas的各个绘图接口，深入理解了canvas的绘图原理，学会在canvas中绘制复杂图形和文字 
