@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>arcTo与绘制一角弯月</title>
+</head>
+<body>
+  <canvas id="canvas" style="border:1px solid #aaa"></canvas>
+  <script>
+  //=================
+  //!!!!!!!
+  //必须逆时针绘制外侧半圆，否则会填充整个半圆
+    window.onload = function(){
+      var canvas = document.getElementById("canvas");
+      canvas.width = 800;
+      canvas.height = 800;
+      var cxt = canvas.getContext("2d");
+      cxt.fillStyle = "#058";
+      cxt.font = "bold 40px Arial";
+      cxt.fillText("月亮好美",100,200);
+      fillMoon(cxt,2,400,400,300,0);
+    }
+    function fillMoon(cxt,d,x,y,r,rot,/*optional*/fillColor){
+      cxt.save();
+      cxt.translate(x,y);
+      cxt.rotate(rot*Math.PI/180);
+      cxt.scale(r,r);
+      pathMoon(cxt,d);
+      cxt.fillStyle = fillColor || "#fb5";
+      cxt.fill();
+      cxt.restore();
+    }
+    function pathMoon(cxt,d){
+      cxt.beginPath();
+      //必须逆时针绘制外侧半圆，否则会填充整个半圆
+      cxt.arc(0,0,1,.5*Math.PI,1.5*Math.PI,true);
+      cxt.moveTo(0,-1);
+      // cxt.arcTo(d,0,0,1,dis(0,-1,d,0)/d);
+      //使用贝塞尔二次曲线绘制
+      cxt.quadraticCurveTo(1.2,0,0,1);
+      cxt.closePath();
+    }
+    function dis(x1,y1,x2,y2){
+      return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));//Math.sqrt返回一个数的平方根
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <canvas id="canvas" style="margin:50px auto;border:1px solid #aaa;display:block;"></canvas>
+  <script>
+ window.onload = function(){
+   var canvas = document.getElementById("canvas");
+   canvas.width = 1024;
+   canvas.height = 768;
+   var cxt = canvas.getContext("2d");
+   //使用createPattern()方法绘制背景图
+   var backCanvas = createBackgroundCanvas();
+   var pattern = cxt.createPattern(backCanvas,"repeat");
+   cxt.globalAlpha = 0.7;
+   cxt.fillStyle = pattern;
+   cxt.fillRect(0,0,1024,768);
+   cxt.lineWidth = 10;
+   cxt.lineJoin = "round";
+   drawRect(cxt,100,350,200,200,10,"blue","red");
+   anotherDrawRect(cxt,200,400,200,200,10,"black","rgba(0,170,170,.7)");
+   drawStar(cxt,50,100,600,500);
+   //绘制三个三角
+   cxt.beginPath();
+   cxt.moveTo(100,100);
+   cxt.lineTo(200,200);
+   cxt.lineTo(100,300);
+   cxt.strokeStyle = "red";
+   cxt.stroke();
+
+   cxt.beginPath();
+   cxt.moveTo(250,100);
+   cxt.lineTo(350,200);
+   cxt.lineTo(250,300);
+   cxt.strokeStyle = "green";
+   cxt.stroke();
+
+   cxt.beginPath();
+   cxt.moveTo(400,100);
+   cxt.lineTo(500,200);
+   cxt.lineTo(400,300);
+   cxt.strokeStyle = "blue";
+   cxt.stroke();
+
+   //绘制箭头
+   cxt.beginPath();
+   cxt.moveTo(600,150);
+   cxt.lineTo(750,150);
+   cxt.lineTo(750,100);
+   cxt.lineTo(850,200);
+   cxt.lineTo(750,300);
+   cxt.lineTo(750,250);
+   cxt.lineTo(600,250);
+   cxt.closePath();
+   //绘制需要描边的填充颜色的封闭多边形，要先填充颜色后描边
+   cxt.fillStyle = "yellow";
+   cxt.shadowColor = "#058";
+   cxt.shadowOffsetX = 10;
+   cxt.shadowOffsetY = 10;
+   cxt.shadowBlur = 5;
+   cxt.fill();
+   cxt.strokeStyle = "black";
+   cxt.stroke();
+ }
+
+    //绘制矩形函数
+    function drawRect(cxt,x,y,width,height,borderWidth,borderColor,fillColor){
+     //矩形状态
+      cxt.beginPath();
+      cxt.rect(x,y,width,height);//原生绘制矩形API
+      cxt.closePath();
+      cxt.lineWidth = borderWidth;
+      cxt.strokeStyle = borderColor;
+      cxt.fillStyle = fillColor;
+    //绘制矩形
+      cxt.fill();
+      cxt.stroke();
+    }
+    function anotherDrawRect(cxt,x,y,width,height,borderWidth,borderColor,fillColor){
+      cxt.lineWidth = borderWidth;
+      cxt.strokeStyle = borderColor;
+      cxt.fillStyle = fillColor;
+      //原生绘制矩形API
+      cxt.fillRect(x,y,width,height);//使用当前填充色绘制一个矩形
+      cxt.strokeRect(x,y,width,height);//使用当前线条颜色绘制一个矩形边框
+    }
+    //绘制五角星函数
+    function drawStar(cxt,r,R,x,y){
+      cxt.beginPath();
+      for(var i=0;i<5;i++){
+        //Math.cos/Math.sin接受弧度为参数,度数*π/180转化为度数,X,Y为五角星在画布上的偏移量
+       cxt.lineTo(Math.cos((18+i*72)*Math.PI/180)*R+x,-Math.sin((18+i*72)*Math.PI/180)*R+y);
+       cxt.lineTo(Math.cos((54+i*72)*Math.PI/180)*r+x,-Math.sin((54+i*72)*Math.PI/180)*r+y);
+      }
+      cxt.closePath();
+      cxt.fill();
+      cxt.stroke();
+    }
+    function createBackgroundCanvas(){
+      var backCanvas = document.createElement("canvas");
+      backCanvas.width = 100;
+      backCanvas.height = 100;
+      var backCanvasCxt = backCanvas.getContext("2d");
+      backCanvasCxt.lineWidth = 2;
+      backCanvasCxt.fillStyle = "yellow";
+      backCanvasCxt.strokeStyle = "black";
+      drawStar(backCanvasCxt,25,50,50,50);
+      return backCanvas;
+    }
+  </script>
+</body>
+</html>

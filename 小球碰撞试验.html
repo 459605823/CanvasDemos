@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>小球碰撞试验</title>
+</head>
+<body>
+  <canvas id="canvas" style="border:1px solid #aaa; margin:50px auto"></canvas>
+  <script>
+  //初始化小球对象
+  //g,vx,vy均为运动学变量:g为重力加速度，vx为水平方向速度，vy为竖直方向速度
+    var ball = {x:512,y:100,r:20,g:2,vx:-4,vy:-10,color:"#005588"}
+    window.onload = function(){
+      var canvas = document.getElementById("canvas");
+      canvas.width = 1024;
+      canvas.height = 768;
+      var cxt = canvas.getContext("2d");
+      setInterval(function(){
+        render(cxt);
+        update()
+      },50)
+    }
+    function update(){
+      ball.x += ball.vx;//小球圆心的X坐标以VX大小改变
+      ball.y += ball.vy;//小球圆心的Y坐标以VY大小改变
+      ball.vy += ball.g;//竖直方向速度受加速度影响递增
+      //碰撞检测：当小球碰撞到容器边框时发生反弹
+     if(ball.y >= 768 - ball.r){
+       ball.y = 768 - ball.r;
+       ball.vy = - ball.vy*0.6;//反弹后竖直方向速度向上，且每次反弹后速度递减
+     }
+     if(ball.x <= ball.r){
+       ball.x = ball.r;
+       ball.vx = -ball.vx*0.1;//反弹后水平方向速度向右，且每次反弹后速度递减
+     }
+    }
+    function render(cxt){
+      cxt.clearRect(0,0,cxt.canvas.width,cxt.canvas.height);
+      cxt.fillStyle = ball.color;
+      cxt.beginPath();
+      cxt.arc(ball.x,ball.y,ball.r,0,2*Math.PI);
+      cxt.fill();
+    }
+  </script>
+</body>
+</html>

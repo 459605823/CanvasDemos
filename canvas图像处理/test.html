@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body style="background:black;">
+  <canvas id="canvas" style="border:1px solid #aaa;display:block;margin:50px auto"></canvas>
+  <input type="range" id="scale-range" min="0.5" max="3.0" step="0.01" value="1.0" style="display:block;margin:20px auto;width:750px;outline:none;">
+  <canvas id="watermark" style="display:none;"></canvas>
+  <script>
+    window.onload = function(){
+      prepareElements();
+    }
+    function prepareElements(){
+      var canvas = document.getElementById("canvas");
+      var cxt = canvas.getContext("2d");
+      var img = new Image();
+      var slider = document.getElementById("scale-range");
+      var scale = slider.value;
+      canvas.width = 750;
+      canvas.height = 750;
+      img.src = "img.jpg";
+      img.onload = function(){
+        drawImageByScale(cxt,img,scale);
+        slider.onmousemove = function(){
+          scale = slider.value;
+          drawImageByScale(cxt,img,scale);
+        }
+      }
+    }
+    function drawWaterMark(text){
+      var waterMarkCanvas = document.getElementById("watermark");
+      var waterMarkContext = waterMarkCanvas.getContext("2d");
+      waterMarkCanvas.width = 600;
+      waterMarkCanvas.height = 100;
+      waterMarkContext.font = "bold 50px Arial";
+      waterMarkContext.lineWidth = "1";
+      waterMarkContext.fillStyle = "rgba(255,255,255,.5)";
+      waterMarkContext.textBaseline = "middle";
+      waterMarkContext.fillText(text,150,50);
+      return waterMarkCanvas;
+    }
+    function drawImageByScale(cxt,img,scale){
+      var imgWidth = img.width*scale;
+      var imgheight = img.height*scale;
+      var dx = canvas.width/2 - imgWidth/2;
+      var dy = canvas.height/2 - imgheight/2;
+      var waterMarkCanvas = drawWaterMark("WJN.com版权所有");
+      cxt.clearRect(0,0,cxt.canvas.width,cxt.canvas.height);
+      cxt.drawImage(img,dx,dy,imgWidth,imgheight);
+      cxt.drawImage(waterMarkCanvas,cxt.canvas.width-waterMarkCanvas.width,cxt.canvas.height-waterMarkCanvas.height);
+    }
+  </script>
+</body>
+</html>

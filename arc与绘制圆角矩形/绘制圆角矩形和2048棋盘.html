@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>绘制圆角矩形和2048棋盘</title>
+</head>
+<body>
+  <canvas id="canvas" style="border:1px solid #aaa"></canvas>
+  <script>
+  window.onload = function(){
+    var canvas = document.getElementById("canvas");
+    var cxt = canvas.getContext("2d");
+    canvas.width = 800;
+    canvas.height = 800;
+    fillRoundRect(cxt,150,150,500,500,10,"#bbada0");//绘制底部背景 (x,y)=(150,150)
+    for(var i=0;i<4;i++){//行
+      for(var j=0;j<4;j++){//列
+        //间隔20，所以内部小格从(170,170)开始绘制,因为小格大小为100*100,所以绘制完一个后在x,y轴
+        //分别偏移120,120
+        fillRoundRect(cxt,170+i*120,170+j*120,100,100,6,"#ccc0b3");
+      }
+    }
+  }
+  //绘制实心圆角矩形
+  function fillRoundRect(cxt,x,y,width,height,r,/*optional*/fillStyle){
+    if(2*r > width || 2*r > height){
+      return;
+    }
+    cxt.save();
+    cxt.translate(x,y);//将起始点定位在（x,y）
+    pathRoundRect(cxt,width,height,r);
+    cxt.fillStyle = fillStyle || "black";
+    cxt.fill();
+    cxt.restore();
+  }
+  //绘制圆角矩形边框
+  function strokeRoundRect(cxt,x,y,width,height,r,/*optional*/strokeStyle,/*optional*/lineWidth){
+    if(2*r > width || 2*r > height){
+      return;
+    }
+    cxt.save();
+    cxt.translate(x,y);//将起始点定位在（x,y）
+    pathRoundRect(cxt,width,height,r);
+    cxt.strokeStyle = strokeStyle || "black";
+    cxt.lineWidth = lineWidth || 1;
+    cxt.stroke();
+    cxt.restore();
+  }
+  function pathRoundRect(cxt,width,height,r){
+    cxt.beginPath();
+    cxt.arc(r,r,r,Math.PI,1.5*Math.PI)//左上角圆弧
+    cxt.arc(width-r,r,r,1.5*Math.PI,2*Math.PI)//右上角圆弧
+    cxt.arc(width-r,height-r,r,0,.5*Math.PI)//右下角圆弧
+    cxt.arc(r,height-r,r,.5*Math.PI,1*Math.PI)//左下角圆弧
+    cxt.closePath();
+  }
+  </script>
+</body>
+</html>

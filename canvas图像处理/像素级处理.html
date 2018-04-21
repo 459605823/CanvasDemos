@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>像素级处理</title>
+</head>
+<body>
+  <div style="margin:20px auto;width:1700px">
+    <canvas id="canvasa" width="750" height="750" style="border:1px solid #aaa;float: left;display:block;"></canvas>
+    <canvas id="canvasb" width="750" height="750" style="border:1px solid #aaa;float: right;display:block;"></canvas>
+  </div>
+  <div style="clear: both"></div>
+  <div style="text-align:center;margin-top:50px;font-size:20px;">
+      <a href="javascript:greyEffect()">Grey Effect</a>
+      <a href="javascript:blackEffect()">Black&White Effect</a>
+      <a href="javascript:reverseEffect()">Reverse Effect</a>
+      <a href="javascript:blurEffect()">Blur Effect</a>
+      <a href="javascript:mosaicEffect()">Mosaic Effect</a>
+  </div>
+  <script>
+    var canvasa = document.getElementById("canvasa");
+    var cxta = canvasa.getContext("2d");
+    var canvasb = document.getElementById("canvasb");
+    var cxtb = canvasb.getContext("2d");
+    var img = new Image();
+    window.onload = function(){
+      img.src = "img.png";
+      img.onload = function(){
+         cxta.drawImage(img,0,0,canvasa.width,canvasa.height);
+      }
+    }
+    //灰度滤镜
+    function greyEffect(){
+      var imgData = cxta.getImageData(0,0,canvasa.width,canvasa.height);
+      var pixelData = imgData.data;
+      for(var i=0;i<canvasb.width*canvasb.height;i++){
+        var r = pixelData[4*i+0];//获取所有像素红色通道的值
+        var g = pixelData[4*i+1];//获取所有像素绿色通道的值
+        var b = pixelData[4*i+2];//获取所有像素蓝色通道的值
+        var grey = r*0.3+g*0.59+b*0.11;//灰度值算法
+        pixelData[4*i+0] = grey;
+        pixelData[4*i+1] = grey;
+        pixelData[4*i+2] = grey;
+      }
+      cxtb.putImageData(imgData,0,0,0,0,canvasb.width,canvasb.height);
+    }
+    //黑白滤镜
+    function blackEffect(){
+      var imgData = cxta.getImageData(0,0,canvasa.width,canvasa.height);
+      var pixelData = imgData.data;
+      for(var i=0;i<canvasb.width*canvasb.height;i++){
+        var r = pixelData[4*i+0];//获取所有像素红色通道的值
+        var g = pixelData[4*i+1];//获取所有像素绿色通道的值
+        var b = pixelData[4*i+2];//获取所有像素蓝色通道的值
+        var grey = r*0.3+g*0.59+b*0.11;//灰度值算法
+        //若灰度大于平均值，就将其设置为白色，否则就为黑色
+        if(grey > 255/2){
+          v = 255;
+        }else{
+          v = 0;
+        }
+        pixelData[4*i+0] = v;
+        pixelData[4*i+1] = v;
+        pixelData[4*i+2] = v;
+      }
+      cxtb.putImageData(imgData,0,0,0,0,canvasb.width,canvasb.height);
+    }
+    //反色滤镜
+    function reverseEffect(){
+      var imgData = cxta.getImageData(0,0,canvasa.width,canvasa.height);
+      var pixelData = imgData.data;
+      for(var i=0;i<canvasb.width*canvasb.height;i++){
+        var r = pixelData[4*i+0];//获取所有像素红色通道的值
+        var g = pixelData[4*i+1];//获取所有像素绿色通道的值
+        var b = pixelData[4*i+2];//获取所有像素蓝色通道的值
+        //设置反色后的色值
+        pixelData[4*i+0] = 255-r;
+        pixelData[4*i+1] = 255-g;
+        pixelData[4*i+2] = 255-b;
+      }
+      cxtb.putImageData(imgData,0,0,0,0,canvasb.width,canvasb.height);
+    }
+    //模糊滤镜:获取某点及其周围点颜色的平均值，以该平均值作为该点最后的颜色值即可实现模糊效果
+    function blurEffect(){
+      var imgData = cxta.getImageData(0,0,canvasa.width,canvasa.height);
+      var pixelData = imgData.data;
+      var tmpImgData = cxta.getImageData(0,0,canvasa.width,canvasa.height);
+      var tmpPixelData = tmpImgData.data;
+      //设置模糊半径
+      var blurR = 3;
+      //获取遍历周围点及其自身的总点数
+      var totalnum = (blurR*2+1)*(blurR*2+1);
+      //遍历canvasb中的所有像素点
+      for(var i=blurR;i<canvasb.height-blurR;i++){//i,j初始值设为-1防止数组越界
+        for(var j=blurR;j<canvasb.width-blurR;j++){
+          var totalr=0,totalg=0,totalb=0;
+          //遍历每个像素周围所有像素点包括其自身
+          for(var dx=-blurR;dx<=blurR;dx++){
+            for(var dy=-blurR;dy<=blurR;dy++){
+              //(x,y)为周围点的坐标
+              var x=i+dx;
+              var y=j+dy;
+              var p = x*canvasb.width+y//获取该点在像素数组中的位置
+              //获取周围点r,g,b通道的值总和
+              totalr += tmpPixelData[p*4+0];
+              totalg += tmpPixelData[p*4+1];
+              totalb += tmpPixelData[p*4+2];
+            }
+          }
+          //获取(i,j)在像素数组中的位置
+          var p = i*canvasb.width+j;
+          pixelData[p*4+0] = totalr/totalnum;
+          pixelData[p*4+1] = totalg/totalnum;
+          pixelData[p*4+2] = totalb/totalnum;
+        }
+      }
+      cxtb.putImageData(imgData,0,0,0,0,canvasb.width,canvasb.height);
+    }
+    //马赛克滤镜
+    function mosaicEffect(){
+      var imgData = cxta.getImageData(0,0,canvasa.width,canvasa.height);
+      var pixelData = imgData.data;
+      var tmpImgData = cxta.getImageData(0,0,canvasa.width,canvasa.height);
+      var tmpPixelData = tmpImgData.data;
+      //设置马赛克块边长
+      var size = 16;
+      //获取马赛克块所有像素点
+      var totalnum = size*size;
+      //遍历canvasb中的所有马赛克块,此时(x,y)为每个马赛克的左上角坐标
+      for(var i=0;i<canvasb.height;i+=size){//i,j初始值设为-1防止数组越界
+        for(var j=0;j<canvasb.width;j+=size){
+          var totalr=0,totalg=0,totalb=0;
+          //遍历每个马赛克块中所有像素点
+          for(var dx=0;dx<size;dx++){
+            for(var dy=0;dy<size;dy++){
+              //(x,y)为周围点的坐标
+              var x=i+dx;
+              var y=j+dy;
+              var p = x*canvasb.width+y//获取该点在像素数组中的位置
+              //获取周围点r,g,b通道的值总和
+              totalr += tmpPixelData[p*4+0];
+              totalg += tmpPixelData[p*4+1];
+              totalb += tmpPixelData[p*4+2];
+            }
+          }
+          //获取(i,j)在像素数组中的位置
+          var p = i*canvasb.width+j;
+          var resr = totalr/totalnum;
+          var resg = totalg/totalnum;
+          var resb = totalb/totalnum;
+          //再次遍历每个马赛克中的所有像素点，将其颜色值设为马赛克块的平均值
+          for(var dx=0;dx<size;dx++){
+            for(var dy=0;dy<size;dy++){
+              var x = i + dx;
+              var y = j + dy;
+              var p = x*canvasb.width + y;
+              pixelData[p*4+0] = resr;
+              pixelData[p*4+1] = resg;
+              pixelData[p*4+2] = resb;
+            }
+          }
+        }
+      }
+      cxtb.putImageData(imgData,0,0,0,0,canvasb.width,canvasb.height);
+    }
+  </script>
+</body>
+</html>

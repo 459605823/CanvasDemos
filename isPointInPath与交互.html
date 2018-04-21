@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>isPointInPath与交互</title>
+</head>
+<body>
+  <canvas id="canvas" style="border:1px solid #aaa;margin:50px auto;display:block"></canvas>
+  <script>
+    var balls = [];
+    var canvas = document.getElementById("canvas");
+    var cxt = canvas.getContext("2d");
+    window.onload = function(){
+      canvas.width = 800;
+      canvas.height = 800;
+      for(var i=0;i<10;i++){
+        var aBall = {
+          x:Math.random()*canvas.width,
+          y:Math.random()*canvas.height,
+          r:Math.random()*50+20
+        }
+        balls.push(aBall);
+      }
+      draw();
+      canvas.addEventListener("mousemove",detect);
+    }
+    function draw(){
+      for(var i=0;i<10;i++){
+        cxt.beginPath();
+        cxt.arc(balls[i].x,balls[i].y,balls[i].r,0,Math.PI*2);
+        cxt.fillStyle = "#058";
+        cxt.fill();
+      }
+    }
+    function detect(e){
+      //获取鼠标点击位置
+      var x = e.clientX - canvas.getBoundingClientRect().left;
+      var y = e.clientY - canvas.getBoundingClientRect().top;
+      for(var i=0;i<10;i++){
+        cxt.beginPath();
+        cxt.arc(balls[i].x,balls[i].y,balls[i].r,0,Math.PI*2);//再次绘制圆球路径
+        if(cxt.isPointInPath(x,y)){//只有在鼠标点击位置上的才会被绘制为红色
+            cxt.fillStyle = "red";
+            cxt.fill();
+        }else{
+          cxt.fillStyle = "#058";
+          cxt.fill();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

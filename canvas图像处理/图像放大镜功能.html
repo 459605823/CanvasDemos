@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>图像放大镜功能</title>
+</head>
+<body>
+  <canvas id="canvas" style="display:block;margin:50px auto;border:1px solid #aaa">
+    您的浏览器不支持canvas,请使用最新版本的浏览器
+  </canvas>
+  <canvas id="offCanvas" style="display:none"></canvas>
+  <script>
+  var canvas = document.getElementById("canvas");
+  var cxt = canvas.getContext("2d");
+  var offCanvas = document.getElementById("offCanvas");
+  var offContext = offCanvas.getContext("2d");
+  var img = new Image();
+  var scale = 2;//放大倍数
+    window.onload = function(){
+      prepareCanvas();
+      prepareMouses();
+    }
+    function prepareCanvas(){
+      img.src = "img.jpg";
+      img.onload = function(){
+        //canvas大小设置为图片大小,离屏canvas大小设置为放大后的大小,可实现放大效果
+      canvas.width = img.width;
+      canvas.height = img.height;
+      offCanvas.width = img.width * scale;
+      offCanvas.height = img.height * scale;
+      cxt.drawImage(img,0,0);
+      offContext.drawImage(img,0,0,offCanvas.width,offCanvas.height);
+      }
+    }
+    function windowToCanvas(x,y){//获取鼠标在canvas的点击位置
+      var box = canvas.getBoundingClientRect();
+      return {x:x-box.left,y:y-box.top};
+    }
+    function prepareMouses(){
+      var isMouseDown = false;
+      var point = {};
+      canvas.onmousedown = function(e){
+        e.preventDefault();
+        isMouseDown = true;
+        point = windowToCanvas(e.clientX,e.clientY);
+        drawCanvasWithMagnifier(isMouseDown,point);
+      }
+      canvas.onmousemove = function(e){
+        e.preventDefault();
+        if(isMouseDown){
+          point = windowToCanvas(e.clientX,e.clientY);
+          drawCanvasWithMagnifier(isMouseDown,point);
+        }
+      }
+      canvas.onmouseup = function(e){
+        e.preventDefault();
+        isMouseDown = false;
+        drawCanvasWithMagnifier(isMouseDown);
+      }
+      canvas.onmouseout = function(e){
+        e.preventDefault();
+        isMouseDown = false;
+        drawCanvasWithMagnifier(isMouseDown);
+      }
+    }
+    function drawCanvasWithMagnifier(isShowMagnifier,point){
+      cxt.clearRect(0,0,canvas.width,canvas.height);
+      cxt.drawImage(img,0,0,canvas.width,canvas.height);
+      if(isShowMagnifier){
+        drawMagnifier(point);
+      }
+    }
+    function drawMagnifier(point){
+      //离屏canvas上的鼠标点击位置
+     var offImg_cx = point.x * scale;
+     var offImg_cy = point.y * scale;
+     var mr = 100;//放大镜半径
+     //离屏canvas放大区域左上角的(x,y)坐标
+     var sx = offImg_cx-mr;
+     var sy = offImg_cy-mr;
+     //显示canvas放大区域左上角的(x,y)坐标
+     var dx = point.x - mr;
+     var dy = point.y - mr;
+     cxt.save();
+     cxt.lineWidth = 10;
+     cxt.strokeStyle = "#068";
+     cxt.beginPath();
+     cxt.arc(point.x,point.y,mr,0,Math.PI*2);
+     cxt.stroke();
+     cxt.clip();
+     cxt.drawImage(offCanvas,sx,sy,2*mr,2*mr,dx,dy,2*mr,2*mr);
+     cxt.restore();
+    }
+  </script>
+</body>
+</html>

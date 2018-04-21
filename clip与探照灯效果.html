@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>clip与探照灯效果</title>
+</head>
+<body>
+  <canvas id="canvas"style="border:1px solid #aaa;margin:50px auto;display:block;"></canvas>
+  <script>
+    var searchlight = {x:400,y:400,radius:150,vx:Math.random()*5+10,vy:Math.random()*5+10,rot:0};
+    window.onload = function(){
+      var canvas = document.getElementById("canvas");
+      canvas.width = 800;
+      canvas.height = 800;
+      var cxt = canvas.getContext("2d");
+      setInterval(function(){
+        render(cxt);
+        update(canvas.width,canvas.height,searchlight.rot);
+      },40)
+    }
+    function render(cxt){
+      var canvas = cxt.canvas;
+      cxt.clearRect(0,0,canvas.width,canvas.height);
+      cxt.save();
+      //绘制黑色背景
+      cxt.beginPath();
+      cxt.fillStyle = "black";
+      cxt.fillRect(0,0,canvas.width,canvas.height);
+      //绘制圆形探照灯
+      cxt.beginPath();
+      // 圆形探照灯cxt.arc(searchlight.x,searchlight.y,searchlight.radius,0,Math.PI*2);
+      drawStar(cxt,searchlight.radius,searchlight.x,searchlight.y,searchlight.rot)
+      cxt.fillStyle = "#fff";
+      cxt.fill();
+      cxt.clip();
+      //绘制底部字体
+      cxt.font = "bold 150px Arial";
+      cxt.textAlign = "center";
+      cxt.textBaseline = "middle";
+      cxt.fillStyle = "#058";
+      cxt.fillText("CANVAS",canvas.width/2,canvas.height/4);
+      cxt.fillText("CANVAS",canvas.width/2,canvas.height/2);
+      cxt.fillText("CANVAS",canvas.width/2,canvas.height*3/4);
+      cxt.restore();
+    }
+    function update(canvasWidth,canvasHeight,rot){
+      searchlight.x += searchlight.vx;
+      searchlight.y += searchlight.vy;
+      searchlight.rot++;
+      if(searchlight.x-searchlight.radius <= 0){
+        searchlight.vx = -searchlight.vx;
+        searchlight.x = searchlight.radius;
+      }
+      if(searchlight.y-searchlight.radius <= 0){
+        searchlight.vy = -searchlight.vy;
+        searchlight.y = searchlight.radius;
+      }
+      if(searchlight.x+searchlight.radius >= canvasWidth){
+        searchlight.vx = -searchlight.vx;
+        searchlight.x =canvasWidth-searchlight.radius;
+      }
+      if(searchlight.y+searchlight.radius >= canvasHeight){
+        searchlight.vy = -searchlight.vy;
+        searchlight.y =canvasHeight-searchlight.radius;
+      }
+    }
+    function drawStar(cxt,r,x,y,rot){  //rot为星星旋转的角度
+      //*256保证可以取到255
+     cxt.save();
+     //图形变化
+     cxt.translate(x,y);
+     cxt.rotate(rot*Math.PI/180);
+     cxt.scale(r,r);
+     starPath(cxt);
+     cxt.restore();
+    }
+    //解耦drawStar函数，将路径绘制封装为一个独立的函数
+    function starPath(cxt){
+      cxt.beginPath();
+      for(var i=0;i<5;i++){
+        //Math.cos/Math.sin接受弧度为参数,度数*π/180转化为度数
+        //这时绘制出的星星都叠在一起,没有进行位置变化
+       cxt.lineTo(Math.cos((18+i*72)*Math.PI/180),-Math.sin((18+i*72)*Math.PI/180));
+       cxt.lineTo(Math.cos((54+i*72)*Math.PI/180)*0.5,-Math.sin((54+i*72)*Math.PI/180)*0.5);
+      }
+      cxt.closePath();
+    }
+  </script>
+</body>
+</html>
